@@ -9,7 +9,9 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -146,10 +148,7 @@ public class QuerydslBasicTest {
   }
 
   /**
-   * 회원 정렬 순서
-   * 1. 회원 나이 내림차순(desc)
-   * 2. 회원 이름 올림차순(asc)
-   * 단 2에서 회원 이름이 없으면 마지막에 출력(nulls last)
+   * 회원 정렬 순서 1. 회원 나이 내림차순(desc) 2. 회원 이름 올림차순(asc) 단 2에서 회원 이름이 없으면 마지막에 출력(nulls last)
    */
   @Test
   public void sort() {
@@ -277,8 +276,8 @@ public class QuerydslBasicTest {
   }
 
   /**
-   * 예) 회원과 팀을 조인하면서, 팀 이름이 teamA인 팀만 조인, 회원은 모두 조회
-   * JPQL: select m, t from Member m left join m.team t on t.name = 'teamA'
+   * 예) 회원과 팀을 조인하면서, 팀 이름이 teamA인 팀만 조인, 회원은 모두 조회 JPQL: select m, t from Member m left join m.team
+   * t on t.name = 'teamA'
    */
   @Test
   public void join_on_filtering() {
@@ -293,8 +292,7 @@ public class QuerydslBasicTest {
   }
 
   /**
-   * 연관관계 없는 엔티티 외부 조인
-   * 회원의 이름이 팀 이름과 같은 대상 외부 조인
+   * 연관관계 없는 엔티티 외부 조인 회원의 이름이 팀 이름과 같은 대상 외부 조인
    */
   @Test
   public void join_on_no_relation() {
@@ -348,7 +346,7 @@ public class QuerydslBasicTest {
    * 나이가 가장 많은 회원 조회
    */
   @Test
-  public void subQuery(){
+  public void subQuery() {
     QMember memberSub = new QMember("memberSub");
     List<Member> result = queryFactory
         .selectFrom(member)
@@ -366,7 +364,7 @@ public class QuerydslBasicTest {
    * 나이가 평균 이상인 회원
    */
   @Test
-  public void subQueryGoe(){
+  public void subQueryGoe() {
     QMember memberSub = new QMember("memberSub");
     List<Member> result = queryFactory
         .selectFrom(member)
@@ -381,10 +379,10 @@ public class QuerydslBasicTest {
   }
 
   /**
-   *  서브쿼리 여러 건 처리, in 사용
+   * 서브쿼리 여러 건 처리, in 사용
    */
   @Test
-  public void subQueryIn(){
+  public void subQueryIn() {
     QMember memberSub = new QMember("memberSub");
     List<Member> result = queryFactory
         .selectFrom(member)
@@ -426,7 +424,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void complexCase(){
+  public void complexCase() {
     List<String> result = queryFactory
         .select(new CaseBuilder()
             .when(member.age.between(0, 20)).then("0~20살")
@@ -439,7 +437,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void constant(){
+  public void constant() {
     List<Tuple> result = queryFactory
         .select(member.username, Expressions.constant("A"))
         .from(member)
@@ -450,7 +448,7 @@ public class QuerydslBasicTest {
 
 
   @Test
-  public void concat(){
+  public void concat() {
     //{username}_{age}
     List<String> result = queryFactory
         .select(member.username.concat("_").concat(member.age.stringValue()))
@@ -462,7 +460,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void simpleProjection(){
+  public void simpleProjection() {
     List<String> result = queryFactory
         .select(member.username)
         .from(member)
@@ -472,7 +470,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void tupleProjection(){
+  public void tupleProjection() {
     List<Tuple> result = queryFactory
         .select(member.username, member.age)
         .from(member)
@@ -487,7 +485,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void findDtoByJPQL(){
+  public void findDtoByJPQL() {
     List<MemberDto> result = em.createQuery(
             "select new study.querydsl.dto.MemberDto(m.username, m.age) from Member m", MemberDto.class)
         .getResultList();
@@ -495,7 +493,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void findDtoBySetter(){
+  public void findDtoBySetter() {
     List<MemberDto> result = queryFactory
         .select(Projections.bean(MemberDto.class,
             member.username,
@@ -507,7 +505,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void findDtoByField(){
+  public void findDtoByField() {
     List<MemberDto> result = queryFactory
         .select(Projections.fields(MemberDto.class,
             member.username,
@@ -519,7 +517,7 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void findDtoByConstructor(){
+  public void findDtoByConstructor() {
     List<MemberDto> result = queryFactory
         .select(Projections.constructor(MemberDto.class,
             member.username,
@@ -551,7 +549,7 @@ public class QuerydslBasicTest {
             ExpressionUtils.as(JPAExpressions
                 .select(memberSub.age.max())
                 .from(memberSub), "age")
-            ))
+        ))
         .from(member)
         .fetch();
 
@@ -591,10 +589,10 @@ public class QuerydslBasicTest {
 
   private List<Member> searchMember1(String usernameCond, Integer ageCond) {
     BooleanBuilder builder = new BooleanBuilder();
-    if(usernameCond != null){
+    if (usernameCond != null) {
       builder.and(member.username.eq(usernameCond));
     }
-    if(ageCond != null){
+    if (ageCond != null) {
       builder.and(member.age.eq(ageCond));
     }
 
@@ -602,5 +600,35 @@ public class QuerydslBasicTest {
         .selectFrom(member)
         .where(builder)
         .fetch();
+  }
+
+  @Test
+  public void dynamicQuery_WhereParam() {
+    String usernameParam = "member1";
+    Integer ageParam = 10;
+
+    List<Member> result = searchMember2(usernameParam, ageParam);
+    assertThat(result.size()).isEqualTo(1);
+  }
+
+  private List<Member> searchMember2(String usernameCond, Integer ageCond) {
+    return queryFactory
+        .selectFrom(member)
+        .where(usernameEq(usernameCond), ageEq(ageCond))
+        .fetch();
+  }
+
+  private BooleanExpression usernameEq(String usernameCond) {
+    if (usernameCond == null)
+      return null;
+    return member.username.eq(usernameCond);
+  }
+
+  private BooleanExpression ageEq(Integer ageCond) {
+    return ageCond != null ? member.age.eq(ageCond) : null;
+  }
+
+  private BooleanExpression allEq(String usernameCond, Integer ageCond) {
+    return usernameEq(usernameCond).and(ageEq(ageCond));
   }
 }
