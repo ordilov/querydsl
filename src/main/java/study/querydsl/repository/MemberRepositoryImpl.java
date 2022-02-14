@@ -5,12 +5,14 @@ import static study.querydsl.enttiy.QMember.member;
 import static study.querydsl.enttiy.QTeam.team;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.dto.QMemberTeamDto;
@@ -85,7 +87,18 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         )
         .fetch();
 
-    return new PageImpl<>(result, pageable, result.size());
+    JPAQuery<Long> countQuery = queryFactory
+        .select(member.count())
+        .from(member)
+        .leftJoin(member.team, team)
+        .where(
+            usernameEq(condition.getUsername()),
+            teamNameEq(condition.getTeamName()),
+            ageGoe(condition.getAgeGoe()),
+            ageLoe(condition.getAgeLoe())
+        );
+
+    return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
   }
 
   private BooleanExpression ageGoe(Integer ageGoe) {
