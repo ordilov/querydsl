@@ -133,7 +133,10 @@ public class QuerydslBasicTest {
   }
 
   /**
-   * 회원 정렬 순서 1. 회원 나이 내림차순(desc) 2. 회원 이름 올림차순(asc) 단 2에서 회원 이름이 없으면 마지막에 출력(nulls last)
+   * 회원 정렬 순서
+   * 1. 회원 나이 내림차순(desc)
+   * 2. 회원 이름 올림차순(asc)
+   * 단 2에서 회원 이름이 없으면 마지막에 출력(nulls last)
    */
   @Test
   public void sort() {
@@ -154,7 +157,6 @@ public class QuerydslBasicTest {
     assertThat(member6.getUsername()).isEqualTo("member6");
     assertThat(memberNull.getUsername()).isNull();
   }
-
 
   @Test
   public void paging1() {
@@ -226,6 +228,75 @@ public class QuerydslBasicTest {
     assertThat(teamA.get(member.age.avg())).isEqualTo(15);
     assertThat(teamB.get(team.name)).isEqualTo("teamB");
     assertThat(teamB.get(member.age.avg())).isEqualTo(35);
+  }
+
+  /**
+   * 팀 A에 소속된 모든 회원
+   */
+  @Test
+  public void join() {
+    List<Member> result = queryFactory
+        .selectFrom(member)
+        .join(member.team, team)
+        .where(team.name.eq("teamA"))
+        .fetch();
+
+    assertThat(result)
+        .extracting("username")
+        .containsExactly("member1", "member2");
+  }
+
+  @Test
+  public void theta_join() {
+    em.persist(new Member("teamA"));
+    em.persist(new Member("teamB"));
+    em.persist(new Member("teamC"));
+
+    List<Member> result = queryFactory
+        .select(member)
+        .from(member, team)
+        .where(member.username.eq(team.name))
+        .fetch();
+
+    assertThat(result)
+        .extracting("username")
+        .containsExactly("teamA", "teamB");
+  }
+
+  /**
+   * 예) 회원과 팀을 조인하면서, 팀 이름이 teamA인 팀만 조인, 회원은 모두 조회
+   * JPQL: select m, t from Member m left join m.team t on t.name = 'teamA'
+   */
+  @Test
+  public void join_on_filtering() {
+    List<Tuple> result = queryFactory
+        .select(member, team)
+        .from(member)
+        .leftJoin(member.team, team)
+        .on(team.name.eq("teamA"))
+        .fetch();
+
+    result.forEach(System.out::println);
+  }
+
+  /**
+   * 연관관계 없는 엔티티 외부 조인
+   * 회원의 이름이 팀 이름과 같은 대상 외부 조인
+   */
+  @Test
+  public void join_on_no_relation() {
+    em.persist(new Member("teamA"));
+    em.persist(new Member("teamB"));
+    em.persist(new Member("teamC"));
+
+    List<Tuple> result = queryFactory
+        .select(member, team)
+        .from(member)
+        .leftJoin(team)
+        .on(member.username.eq(team.name))
+        .fetch();
+
+    result.forEach(System.out::println);
   }
 
 }
