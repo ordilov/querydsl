@@ -1,11 +1,13 @@
 package study.querydsl;
 
+import static com.querydsl.jpa.JPAExpressions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.enttiy.QMember.member;
 import static study.querydsl.enttiy.QTeam.team;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.enttiy.Member;
+import study.querydsl.enttiy.QMember;
 import study.querydsl.enttiy.Team;
 
 @SpringBootTest
@@ -332,4 +335,73 @@ public class QuerydslBasicTest {
     boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
     assertThat(loaded).as("페치 조인 적용").isTrue();
   }
+
+  /**
+   * 나이가 가장 많은 회원 조회
+   */
+  @Test
+  public void subQuery(){
+    QMember memberSub = new QMember("memberSub");
+    List<Member> result = queryFactory
+        .selectFrom(member)
+        .where(member.age.eq(
+            select(memberSub.age.max())
+                .from(memberSub)
+        ))
+        .fetch();
+
+    assertThat(result).extracting("age")
+        .containsExactly(40);
+  }
+
+  /**
+   * 나이가 평균 이상인 회원
+   */
+  @Test
+  public void subQueryGoe(){
+    QMember memberSub = new QMember("memberSub");
+    List<Member> result = queryFactory
+        .selectFrom(member)
+        .where(member.age.goe(
+            select(memberSub.age.avg())
+                .from(memberSub)
+        ))
+        .fetch();
+
+    assertThat(result).extracting("age")
+        .containsExactly(30, 40);
+  }
+
+  /**
+   *  서브쿼리 여러 건 처리, in 사용
+   */
+  @Test
+  public void subQueryIn(){
+    QMember memberSub = new QMember("memberSub");
+    List<Member> result = queryFactory
+        .selectFrom(member)
+        .where(member.age.in(
+            select(memberSub.age)
+                .from(memberSub)
+                .where(memberSub.age.gt(10))
+        ))
+        .fetch();
+
+    assertThat(result).extracting("age")
+        .containsExactly(20, 30, 40);
+  }
+
+  @Test
+  public void selectSubQuery() {
+    QMember memberSub = new QMember("memberSub");
+    List<Tuple> result = queryFactory
+        .select(member.username,
+            select(memberSub.age.avg())
+                .from(memberSub))
+        .from(member)
+        .fetch();
+
+    result.forEach(System.out::println);
+  }
+
 }
