@@ -1,6 +1,7 @@
 package study.querydsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static study.querydsl.enttiy.QMember.member;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.Objects;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.enttiy.Member;
-import study.querydsl.enttiy.QMember;
 import study.querydsl.enttiy.Team;
 
 @SpringBootTest
@@ -48,7 +48,7 @@ public class QuerydslBasicTest {
     //member1을 찾아라.
     String qlString =
         "select m from Member m "
-        + "where m.username = :username";
+            + "where m.username = :username";
     Member findMEmber = em.createQuery(qlString,
             Member.class)
         .setParameter("username", "member1")
@@ -58,13 +58,11 @@ public class QuerydslBasicTest {
   }
 
   @Test
-  public void startQuerydsl(){
-    QMember m = new QMember("m");
-
+  public void startQuerydsl() {
     Member findMember = queryFactory
-        .select(m)
-        .from(m)
-        .where(m.username.eq("member1"))
+        .select(member)
+        .from(member)
+        .where(member.username.eq("member1"))
         .fetchOne();
 
     assertThat(Objects.requireNonNull(findMember).getUsername()).isEqualTo("member1");
