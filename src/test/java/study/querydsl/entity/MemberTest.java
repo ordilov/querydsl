@@ -1,4 +1,4 @@
-package study.querydsl.enttiy;
+package study.querydsl.entity;
 
 import java.util.List;
 import javax.persistence.EntityManager;

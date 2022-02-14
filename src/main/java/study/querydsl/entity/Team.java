@@ -1,4 +1,4 @@
-package study.querydsl.enttiy;
+package study.querydsl.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 

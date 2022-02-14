@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import study.querydsl.enttiy.Member;
-import study.querydsl.enttiy.Team;
+import study.querydsl.entity.Member;
+import study.querydsl.entity.Team;
 
 @Profile("local")
 @Component

@@ -1,8 +1,8 @@
 package study.querydsl.repository;
 
 import static org.springframework.util.StringUtils.hasText;
-import static study.querydsl.enttiy.QMember.member;
-import static study.querydsl.enttiy.QTeam.team;
+import static study.querydsl.entity.QMember.member;
+import static study.querydsl.entity.QTeam.team;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.dto.QMemberTeamDto;
-import study.querydsl.enttiy.Member;
+import study.querydsl.entity.Member;
 
 @Repository
 @RequiredArgsConstructor

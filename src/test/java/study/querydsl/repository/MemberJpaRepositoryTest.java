@@ -1,7 +1,6 @@
 package study.querydsl.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -11,8 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
-import study.querydsl.enttiy.Member;
-import study.querydsl.enttiy.Team;
+import study.querydsl.entity.Member;
+import study.querydsl.entity.Team;
 
 @SpringBootTest
 @Transactional

@@ -1,8 +1,8 @@
 package study.querydsl.repository;
 
 import static org.springframework.util.StringUtils.hasText;
-import static study.querydsl.enttiy.QMember.member;
-import static study.querydsl.enttiy.QTeam.team;
+import static study.querydsl.entity.QMember.member;
+import static study.querydsl.entity.QTeam.team;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
